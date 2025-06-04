@@ -3,130 +3,667 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mamas Wetterseite</title>
+    <title>Wetter für die beste Mama der Welt</title>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to top, #bde0fe, #fff);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #c2185b 0%, #e91e63 30%, #f06292 60%, #f8bbd9 100%);
+            min-height: 100vh;
+            padding: 0.75rem;
+            position: relative;
             overflow-x: hidden;
         }
-        .sky {
+
+        /* Animationen */
+        .weather-animation {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1; overflow: hidden;
+        }
+        
+        /* Herz-Animationen */
+        .heart {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 0;
-        }
-        .cloud {
-            background: #fff;
-            border-radius: 50%;
-            position: absolute;
-            animation: floatClouds 60s linear infinite;
-            opacity: 0.8;
-        }
-        .sun {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle, #ff0, #f90);
-            border-radius: 50%;
-            top: 10%;
-            left: -10%;
-            animation: sunMove 120s linear infinite;
-        }
-        @keyframes floatClouds {
-            0% { left: -200px; }
-            100% { left: 110%; }
-        }
-        @keyframes sunMove {
-            0% { left: -10%; top: 10%; }
-            50% { left: 50%; top: 5%; }
-            100% { left: 110%; top: 10%; }
-        }
-        .container {
-            position: relative;
-            z-index: 1;
-            padding: 2rem 1rem;
-            color: #003366;
-            text-align: center;
-        }
-        h1 {
+            color: rgba(255, 255, 255, 0.8);
             font-size: 2rem;
+            animation: heartFloat linear infinite;
+        }
+        
+        .heart:nth-child(1) { top: 10%; animation-duration: 25s; font-size: 1.5rem; }
+        .heart:nth-child(2) { top: 20%; animation-duration: 30s; animation-delay: -10s; font-size: 2rem; }
+        .heart:nth-child(3) { top: 30%; animation-duration: 35s; animation-delay: -20s; font-size: 1.8rem; }
+        .heart:nth-child(4) { top: 15%; animation-duration: 28s; animation-delay: -5s; font-size: 1.6rem; }
+        .heart:nth-child(5) { top: 25%; animation-duration: 32s; animation-delay: -15s; font-size: 2.2rem; }
+        .heart:nth-child(6) { top: 35%; animation-duration: 27s; animation-delay: -25s; font-size: 1.4rem; }
+        
+        @keyframes heartFloat {
+            0% { left: -100px; transform: translateY(0) scale(1) rotate(0deg); opacity: 0.8; }
+            25% { transform: translateY(-20px) scale(1.1) rotate(5deg); opacity: 1; }
+            50% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0.9; }
+            75% { transform: translateY(-15px) scale(0.9) rotate(-3deg); opacity: 1; }
+            100% { left: calc(100% + 100px); transform: translateY(0) scale(1) rotate(0deg); opacity: 0.8; }
+        }
+
+        /* Regen Animation */
+        .rain {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(transparent, rgba(135, 206, 235, 0.7));
+            animation: rainFall linear infinite;
+            opacity: 0.6;
+        }
+        @keyframes rainFall { to { transform: translateY(100vh); } }
+
+        .container { max-width: 100%; margin: 0 auto; position: relative; z-index: 10; }
+        
+        .header { text-align: center; margin-bottom: 1.5rem; padding: 0 0.5rem; }
+        .header h1 {
+            font-size: 1.75rem; font-weight: bold; color: white; margin-bottom: 0.5rem;
+            line-height: 1.2; text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .header p {
+            color: rgba(255,255,255,0.95); font-size: 0.95rem; margin-bottom: 0.25rem;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        }
+
+        .current-weather, .forecast-container, .chart-container, .rain-alert {
+            background: rgba(0,0,0,0.25); backdrop-filter: blur(20px);
+            border-radius: 1.25rem; padding: 1.5rem; margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.2);
+        }
+        .chart-container { height: 250px; padding: 1rem; }
+
+        /* Spezielle Regenwarnung */
+        .rain-alert {
+            background: rgba(255,152,0,0.2);
+            border: 2px solid #ff9800;
             margin-bottom: 1rem;
+            animation: alertPulse 2s ease-in-out infinite;
         }
-        .forecast {
-            display: flex;
-            overflow-x: auto;
-            gap: 1rem;
-            padding: 1rem;
+        @keyframes alertPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(255,152,0,0.5); }
+            50% { box-shadow: 0 0 20px rgba(255,152,0,0.8); }
         }
-        .day {
-            flex: 0 0 auto;
-            width: 240px;
-            background: rgba(255,255,255,0.95);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            text-align: left;
+        .rain-alert h3 {
+            color: #ff9800; font-size: 1.2rem; font-weight: bold;
+            margin-bottom: 1rem; text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
-        .day h3 {
-            margin-top: 0;
-            font-size: 1.4rem;
+        .rain-times {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
         }
-        .day p {
-            margin: 0.3rem 0;
+        .rain-time {
+            background: rgba(0,0,0,0.3); border-radius: 0.75rem; padding: 0.75rem;
+            text-align: center; color: white;
         }
-        @media (min-width: 768px) {
-            .forecast {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
+        .rain-time .time {
+            font-weight: bold; font-size: 1rem; margin-bottom: 0.25rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .rain-time .desc {
+            font-size: 0.8rem; color: rgba(255,255,255,0.9);
+        }
+
+        .current-header h2 {
+            font-size: 1.5rem; font-weight: bold; color: white; margin-bottom: 0.5rem;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.4); text-align: center;
+        }
+        .current-time {
+            color: rgba(255,255,255,0.95); font-size: 0.9rem;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.3); text-align: center;
+        }
+
+        .current-main { text-align: center; margin: 1.5rem 0; }
+        .current-icon {
+            font-size: 4rem; margin-bottom: 1rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        @keyframes bounce { 
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 
+            40% { transform: translateY(-10px); } 
+            60% { transform: translateY(-5px); } 
+        }
+        
+        .current-temp {
+            font-size: 3rem; font-weight: bold; color: white; margin-bottom: 0.5rem;
+            line-height: 1; text-shadow: 0 3px 8px rgba(0,0,0,0.5);
+        }
+        .feels-like {
+            color: rgba(255,255,255,0.95); margin-bottom: 0.75rem; font-size: 1rem;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        }
+        .condition {
+            color: #fff8e1; font-weight: 600; font-size: 1.1rem; margin-bottom: 1rem;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+        .rain-chance {
+            display: flex; align-items: center; justify-content: center;
+            color: #e3f2fd; font-weight: 500; font-size: 1rem;
+            background: rgba(0,0,0,0.3); border-radius: 2rem; padding: 0.75rem 1.5rem;
+            margin: 0 auto; max-width: 220px; box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .today-range {
+            text-align: center; background: rgba(0,0,0,0.3); border-radius: 1rem;
+            padding: 1rem; margin-top: 1.5rem; box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .today-range .label {
+            color: rgba(255,255,255,0.95); font-size: 0.875rem; margin-bottom: 0.5rem;
+        }
+        .today-range .temps {
+            font-size: 1.5rem; font-weight: bold; color: white;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        .details-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;
+        }
+        .detail-card {
+            background: rgba(0,0,0,0.3); border-radius: 1rem; padding: 1rem; text-align: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2); transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .detail-card:active { transform: scale(0.95); }
+        .detail-card .icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .detail-card .value {
+            font-weight: bold; color: white; font-size: 1rem; margin-bottom: 0.25rem;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+        .detail-card .label {
+            color: rgba(255,255,255,0.9); font-size: 0.8rem;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        }
+
+        .tabs {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1.5rem;
+        }
+        .tab {
+            display: flex; align-items: center; justify-content: center;
+            padding: 0.875rem 1rem; border-radius: 1rem; font-weight: 500;
+            transition: all 0.3s ease; cursor: pointer; border: none;
+            font-size: 0.85rem; box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .tab.active {
+            background: white; color: #c2185b;
+            box-shadow: 0 10px 25px -3px rgba(0,0,0,0.3); transform: scale(1.02);
+        }
+        .tab.inactive {
+            background: rgba(0,0,0,0.3); color: white;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        }
+        .tab:active { transform: scale(0.98); }
+        .tab .icon { margin-right: 0.5rem; font-size: 1rem; }
+
+        .forecast-title {
+            color: white; font-size: 1.4rem; font-weight: bold;
+            margin-bottom: 1.5rem; text-align: center;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+        .forecast-scroll {
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .forecast-scroll::-webkit-scrollbar { display: none; }
+        .forecast-grid { display: flex; gap: 1rem; padding-bottom: 0.5rem; }
+        .forecast-card {
+            background: rgba(0,0,0,0.3); border-radius: 1rem; padding: 1rem;
+            text-align: center; border: 1px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease; min-width: 120px; flex-shrink: 0;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .forecast-card:active { transform: scale(0.95); }
+        .forecast-card.today {
+            background: rgba(255,255,255,0.15); border: 2px solid #ffd54f;
+            box-shadow: 0 0 20px rgba(255,213,79,0.4);
+        }
+        .forecast-day {
+            color: white; font-weight: 600; margin-bottom: 0.25rem; font-size: 0.85rem;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+        .forecast-date {
+            color: rgba(255,255,255,0.8); font-size: 0.7rem; margin-bottom: 0.75rem;
+        }
+        .forecast-icon { font-size: 1.8rem; margin: 0.5rem 0; }
+        .forecast-condition {
+            color: rgba(255,255,255,0.95); font-size: 0.75rem; margin-bottom: 0.75rem;
+            line-height: 1.2; height: 2.4em; overflow: hidden;
+        }
+        .forecast-temp {
+            color: white; font-weight: bold; margin-bottom: 0.5rem;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+        .forecast-temp .high { font-size: 1.1rem; }
+        .forecast-temp .low {
+            color: rgba(255,255,255,0.8); font-size: 0.85rem; margin-left: 0.25rem;
+        }
+        .forecast-rain {
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(33,150,243,0.9); font-size: 0.7rem; font-weight: 500;
+        }
+        .forecast-rain .icon { margin-right: 0.25rem; font-size: 0.8rem; }
+
+        .love-message {
+            background: rgba(0,0,0,0.3); border-radius: 1rem; padding: 1rem;
+            margin: 1rem 0; text-align: center; color: white; font-style: italic;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 375px) {
+            body { padding: 0.5rem; }
+            .header h1 { font-size: 1.5rem; }
+            .current-temp { font-size: 2.5rem; }
+            .current-icon { font-size: 3rem; }
+            .heart { font-size: 1.2rem; }
+            .rain-times { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="sky">
-        <div class="sun"></div>
-        <div class="cloud" style="width: 100px; height: 60px; top: 20%; animation-delay: 0s;"></div>
-        <div class="cloud" style="width: 150px; height: 80px; top: 40%; animation-delay: 15s;"></div>
-        <div class="cloud" style="width: 120px; height: 70px; top: 60%; animation-delay: 30s;"></div>
+    <!-- Animationen -->
+    <div class="weather-animation">
+        <div class="heart">💖</div>
+        <div class="heart">💕</div>
+        <div class="heart">❤️</div>
+        <div class="heart">💝</div>
+        <div class="heart">💗</div>
+        <div class="heart">💓</div>
     </div>
+
     <div class="container">
-        <h1>🌤️ Zwei-Wochen-Wettervorschau für Mama</h1>
-        <div class="forecast">
-            <!-- Generierte 14 Tage Vorschau -->
-            <script>
-                const wetterdaten = [
-                    {tag: 'Montag', temp: '22°C', regen: '10%', wolken: '30%', wind: '12 km/h', sonne: '05:32 – 21:17'},
-                    {tag: 'Dienstag', temp: '25°C', regen: '5%', wolken: '20%', wind: '10 km/h', sonne: '05:31 – 21:18'},
-                    {tag: 'Mittwoch', temp: '19°C', regen: '80%', wolken: '90%', wind: '20 km/h', sonne: '05:31 – 21:19'},
-                    {tag: 'Donnerstag', temp: '21°C', regen: '40%', wolken: '60%', wind: '15 km/h', sonne: '05:30 – 21:20'},
-                    {tag: 'Freitag', temp: '23°C', regen: '20%', wolken: '50%', wind: '18 km/h', sonne: '05:30 – 21:21'},
-                    {tag: 'Samstag', temp: '26°C', regen: '0%', wolken: '10%', wind: '10 km/h', sonne: '05:29 – 21:22'},
-                    {tag: 'Sonntag', temp: '27°C', regen: '0%', wolken: '0%', wind: '9 km/h', sonne: '05:29 – 21:23'},
-                    {tag: 'Montag', temp: '28°C', regen: '10%', wolken: '10%', wind: '14 km/h', sonne: '05:28 – 21:24'},
-                    {tag: 'Dienstag', temp: '24°C', regen: '30%', wolken: '40%', wind: '17 km/h', sonne: '05:28 – 21:25'},
-                    {tag: 'Mittwoch', temp: '21°C', regen: '60%', wolken: '80%', wind: '21 km/h', sonne: '05:27 – 21:26'},
-                    {tag: 'Donnerstag', temp: '20°C', regen: '70%', wolken: '90%', wind: '22 km/h', sonne: '05:27 – 21:27'},
-                    {tag: 'Freitag', temp: '22°C', regen: '30%', wolken: '50%', wind: '13 km/h', sonne: '05:26 – 21:28'},
-                    {tag: 'Samstag', temp: '25°C', regen: '10%', wolken: '20%', wind: '11 km/h', sonne: '05:26 – 21:29'},
-                    {tag: 'Sonntag', temp: '26°C', regen: '5%', wolken: '15%', wind: '12 km/h', sonne: '05:25 – 21:30'},
-                ];
-                wetterdaten.forEach(d => {
-                    document.write(`
-                        <div class="day">
-                            <h3>${d.tag}</h3>
-                            <p>🌡️ Temperatur: ${d.temp}</p>
-                            <p>🌧️ Regenwahrscheinlichkeit: ${d.regen}</p>
-                            <p>☁️ Bewölkung: ${d.wolken}</p>
-                            <p>💨 Wind: ${d.wind}</p>
-                            <p>🌅 Sonnenzeit: ${d.sonne}</p>
-                        </div>
-                    `);
-                });
-            </script>
+        <div class="header">
+            <h1>💖 Für die beste Mama der Welt 💖</h1>
+            <p>Dein Wetter in Rumeln-Kaldenhausen</p>
+            <p>14-Tage Prognose ab 4. Juni 2025</p>
+        </div>
+
+        <div class="love-message">
+            👩‍👦‍👦 Liebe Mama, hier ist dein aktuelles Wetter! Du bist die Beste! 🌈💕
+        </div>
+
+        <!-- Regenwarnung -->
+        <div class="rain-alert">
+            <h3>⚠️ Regenwarnung für Mama ☔</h3>
+            <div class="rain-times">
+                <div class="rain-time">
+                    <div class="time">Heute Nachmittag</div>
+                    <div class="desc">Gewitter ab 15:00 Uhr</div>
+                </div>
+                <div class="rain-time">
+                    <div class="time">Morgen Vormittag</div>
+                    <div class="desc">Schauer ab 09:00 Uhr</div>
+                </div>
+                <div class="rain-time">
+                    <div class="time">Freitag</div>
+                    <div class="desc">Leichter Regen ganztägig</div>
+                </div>
+                <div class="rain-time">
+                    <div class="time">Samstag Abend</div>
+                    <div class="desc">Starker Regen ab 18:00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="current-weather">
+            <div class="current-header">
+                <h2>Aktuelles Wetter</h2>
+                <div class="current-time">
+                    <p>Mittwoch, 4. Juni 2025 - Rumeln-Kaldenhausen</p>
+                </div>
+            </div>
+            
+            <div class="current-main">
+                <div class="current-icon">⛈️</div>
+                <div class="current-temp">21°C</div>
+                <div class="feels-like">Gefühlt: 21°C</div>
+                <div class="condition">Gewitter am Nachmittag</div>
+                <div class="rain-chance">
+                    <span style="margin-right: 0.5rem;">☂️</span>
+                    <span>85% Regen</span>
+                </div>
+            </div>
+
+            <div class="today-range">
+                <div class="label">Heute</div>
+                <div class="temps">21° / 14°</div>
+            </div>
+
+            <div class="details-grid">
+                <div class="detail-card">
+                    <div class="icon">💨</div>
+                    <div class="value">18 km/h</div>
+                    <div class="label">Wind</div>
+                </div>
+                <div class="detail-card">
+                    <div class="icon">💧</div>
+                    <div class="value">72%</div>
+                    <div class="label">Luftfeuchtigkeit</div>
+                </div>
+                <div class="detail-card">
+                    <div class="icon">🌧️</div>
+                    <div class="value">12 mm</div>
+                    <div class="label">Niederschlag</div>
+                </div>
+                <div class="detail-card">
+                    <div class="icon">☀️</div>
+                    <div class="value">UV-Index 3</div>
+                    <div class="label">Mäßig</div>
+                </div>
+                <div class="detail-card">
+                    <div class="icon">🌅</div>
+                    <div class="value">05:17</div>
+                    <div class="label">Sonnenaufgang</div>
+                </div>
+                <div class="detail-card">
+                    <div class="icon">🌇</div>
+                    <div class="value">21:44</div>
+                    <div class="label">Sonnenuntergang</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="setActiveTab('temperature')">
+                <span class="icon">🌡️</span>Temperatur
+            </button>
+            <button class="tab inactive" onclick="setActiveTab('precipitation')">
+                <span class="icon">🌧️</span>Niederschlag
+            </button>
+            <button class="tab inactive" onclick="setActiveTab('humidity')">
+                <span class="icon">💧</span>Luftfeuchtigkeit
+            </button>
+            <button class="tab inactive" onclick="setActiveTab('wind')">
+                <span class="icon">💨</span>Wind
+            </button>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="weatherChart" width="400" height="200"></canvas>
+        </div>
+
+        <div class="forecast-container">
+            <h3 class="forecast-title">14-Tage Wettervorhersage für meine liebe Mama</h3>
+            
+            <div class="forecast-scroll">
+                <div class="forecast-grid">
+                    <div class="forecast-card today">
+                        <div class="forecast-day">Heute</div>
+                        <div class="forecast-date">04.06</div>
+                        <div class="forecast-icon">⛈️</div>
+                        <div class="forecast-condition">Gewitter nachmittags</div>
+                        <div class="forecast-temp"><span class="high">21°</span><span class="low">/14°</span></div>
+                        <div class="forecast-rain"><span class="icon">☂️</span>85%</div>
+                    </div>
+                    <div class="forecast-card">
+                        <div class="forecast-day">Morgen</div>
+                        <div class="forecast-date">05.06</div>
+                        <div class="forecast-icon">🌦️</div>
+                        <div class="forecast-condition">Morgenschauer</div>
+                        <div class="forecast-temp"><span class="high">18°</span><span class="low">/11°</span></div>
+                        <div class="forecast-rain"><span class="icon">☂️</span>65%</div>
+                    </div>
+                    <div class="forecast-card">
+                        <div class="forecast-day">Freitag</div>
+                        <div class="forecast-date">06.06</div>
+                        <div class="forecast-icon">🌧️</div>
+                        <div class="forecast-condition">Leichter Regen</div>
+                        <div class="forecast-temp"><span class="high">19°</span><span class="low">/12°</span></div>
+                        <div class="forecast-rain"><span class="icon">☂️</span>70%</div>
+                    </div>
+                    <div class="forecast-card">
+                        <div class="forecast-day">Samstag</div>
+                        <div class="forecast-date">07.06</div>
+                        <div class="forecast-icon">⛈️</div>
+                        <div class="forecast-condition">Starker Regen</div>
+                        <div class="forecast-temp"><span class="high">17°</span><span class="low">/10°</span></div>
+                        <div class="forecast-rain"><span class="icon">☂️</span>90%</div>
+                    </div>
+                    <div class="forecast-card">
+                        <div class="forecast-day">Sonntag</div>
+                        <div class="forecast-date">08.06</div>
+                        <div class="forecast-icon">🌤️</div>
+                        <div class="forecast-condition">Aufklarend</div>
+                        <div class="forecast-temp"><span class="high">20°</span><span class="low">/12°</span></div>
+                        <div class="forecast-rain"><span class="icon">☂️</span>30%</div>
+                    </div>
+                    <div class="forecast-card">
+                        <div class="forecast-day">Montag</div>
+                        <div class="forecast-date">09.06</div>
+                        <div class="forecast-icon">☀️</div>
+                        <div class="forecast-condition">Sonnig</div>
+                        <div class="forecast-temp"><span class="high">23°</span><span class="low">/13°</span></div>
+                        <div class="forecast-rain"><span class="icon">☂️</span>10%</div>
+                    </div>
+                    <div class="forecast-card">
+                        <div class="forecast-day">Dienstag</div>
+                        <div class="forecast-date">10.06</div>
+                        <div class="forecast-icon">☀️</div>
+                        <div class="forecast-condition">Sonnig</div>
+                        <div class="forecast-temp"><span class="high">25°</span><span class="low">/15°</span></div>
+                        <div class="forecast-rain"><span class="icon">☂️</span>5%</div>
+                    </div>
+                    <div class="forecast-card">
+                        <div class="forecast-day">Mittwoch</div>
+                        <div class="forecast-date">11.06</div>
+                        <div class="forecast-icon">🌤️</div>
+                        <div class="forecast-condition">Teilweise bewölkt</div>
+                        <div class="forecast-temp"><span class="high">24°</span><span class="low">/16°</span></div>
+                        <div class="forecast-rain"><span class="icon">☂️</span>20%</div>
+                    </div>
+                    <div class="forecast-card">
+                        <div class="forecast-day">Donnerstag</div>
+                        <div class="forecast-date">12.06</div>
+                        <div class="forecast-icon">🌦️</div>
+                        <div class="forecast-condition">Vereinzelte Schauer</div>
+                        <div class="forecast-temp"><span class="high">22°</span><span class="low">/14°</span></div>
+                        <div class="forecast-rain"><span class="icon">☂️</span>40%</div>
+                    </div>
+                    <div class="forecast-card">
+                        <div class="forecast-day">Freitag</div>
+                        <div class="forecast-date">13.06</div>
+                        <div class="forecast-icon">☀️</div>
+                        <div class="forecast-condition">Sonnig</div>
+                        <div class="forecast-temp"><span class="high">26°</span><span class="low">/16°</span></div>
+                        <div class="forecast-rain"><span class="icon">☂️</span>5%</div>
+                    </div>
+                    <div class="forecast-card">
+                        <div class="forecast-day">Samstag</div>
+                        <div class="forecast-date">14.06</div>
+                        <div class="forecast-icon">☀️</div>
+                        <div class="forecast-condition">Sonnig</div>
+                        <div class="forecast-temp"><span class="high">28°</span><span class="low">/17°</span></div>
+                        <div class="forecast-rain"><span class="icon">☂️</span>5%</div>
+                    </div>
+                    <div class="forecast-card">
+                        <div class="forecast-day">Sonntag</div>
+                        <div class="forecast-date">15.06</div>
+                        <div class="forecast-icon">🌤️</div>
+                        <div class="forecast-condition">Teilweise bewölkt</div>
+                        <div class="forecast-temp"><span class="high">27°</span><span class="low">/18°</span></div>
+                        <div class="forecast-rain"><span class="icon">☂️</span>15%</div>
+                    </div>
+                    <div class="forecast-card">
+                        <div class="forecast-day">Montag</div>
+                        <div class="forecast-date">16.06</div>
+                        <div class="forecast-icon">🌦️</div>
+                        <div class="forecast-condition">Vereinzelte Schauer</div>
+                        <div class="forecast-temp"><span class="high">25°</span><span class="low">/17°</span></div>
+                        <div class="forecast-rain"><span class="icon">☂️</span>35%</div>
+                    </div>
+                    <div class="forecast-card">
+                        <div class="forecast-day">Dienstag</div>
+                        <div class="forecast-date">17.06</div>
+                        <div class="forecast-icon">☀️</div>
+                        <div class="forecast-condition">Sonnig</div>
+                        <div class="forecast-temp"><span class="high">26°</span><span class="low">/17°</span></div>
+                        <div class="forecast-rain"><span class="icon">☂️</span>10%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="love-message">
+                👩💕 Liebe Mama, pass bei dem Regenwetter gut auf dich auf! Du bist die wunderbarste Mama der Welt! 🌺💖
+            </div>
         </div>
     </div>
+
+    <script>
+        let activeTab = 'temperature';
+        const weatherData = [
+            { date: '04.06', high: 21, low: 14, precipitation: 85, humidity: 72, wind: 18 },
+            { date: '05.06', high: 18, low: 11, precipitation: 65, humidity: 68, wind: 15 },
+            { date: '06.06', high: 19, low: 12, precipitation: 70, humidity: 70, wind: 12 },
+            { date: '07.06', high: 17, low: 10, precipitation: 90, humidity: 75, wind: 20 },
+            { date: '08.06', high: 20, low: 12, precipitation: 30, humidity: 60, wind: 14 },
+            { date: '09.06', high: 23, low: 13, precipitation: 10, humidity: 50, wind: 10 },
+            { date: '10.06', high: 25, low: 15, precipitation: 5, humidity: 45, wind: 8 },
+            { date: '11.06', high: 24, low: 16, precipitation: 20, humidity: 52, wind: 11 },
+            { date: '12.06', high: 22, low: 14, precipitation: 40, humidity: 58, wind: 13 },
+            { date: '13.06', high: 26, low: 16, precipitation: 5, humidity: 45, wind: 9 },
+            { date: '14.06', high: 28, low: 17, precipitation: 5, humidity: 42, wind: 8 },
+            { date: '15.06', high: 27, low: 18, precipitation: 15, humidity: 48, wind: 10 },
+            { date: '16.06', high: 25, low: 17, precipitation: 35, humidity: 55, wind: 12 },
+            { date: '17.06', high: 26, low: 17, precipitation: 10, humidity: 47, wind: 9 }
+        ];
+
+        function drawChart() {
+            const canvas = document.getElementById('weatherChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            ctx.clearRect(0, 0, width, height);
+            
+            const padding = 40;
+            const chartWidth = width - 2 * padding;
+            const chartHeight = height - 2 * padding;
+            
+            let data, color, maxValue;
+            switch(activeTab) {
+                case 'temperature':
+                    data = weatherData.map(d => d.high);
+                    color = '#c2185b';
+                    maxValue = Math.max(...data) + 2;
+                    break;
+                case 'precipitation':
+                    data = weatherData.map(d => d.precipitation);
+                    color = '#2196f3';
+                    maxValue = 100;
+                    break;
+                case 'humidity':
+                    data = weatherData.map(d => d.humidity);
+                    color = '#9c27b0';
+                    maxValue = 100;
+                    break;
+                case 'wind':
+                    data = weatherData.map(d => d.wind);
+                    color = '#4caf50';
+                    maxValue = Math.max(...data) + 5;
+                    break;
+            }
+            
+            // Grid
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 1;
+            for(let i = 0; i <= 5; i++) {
+                const y = padding + (chartHeight / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+            }
+            
+            // Chart
+            if(activeTab === 'precipitation' || activeTab === 'wind') {
+                const barWidth = chartWidth / data.length * 0.6;
+                const barSpacing = chartWidth / data.length;
+                ctx.fillStyle = color;
+                data.forEach((value, index) => {
+                    const barHeight = (value / maxValue) * chartHeight;
+                    const x = padding + index * barSpacing + (barSpacing - barWidth) / 2;
+                    const y = height - padding - barHeight;
+                    ctx.fillRect(x, y, barWidth, barHeight);
+                });
+            } else {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                data.forEach((value, index) => {
+                    const x = padding + (index / (data.length - 1)) * chartWidth;
+                    const y = height - padding - (value / maxValue) * chartHeight;
+                    if(index === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                ctx.stroke();
+                
+                ctx.fillStyle = color;
+                data.forEach((value, index) => {
+                    const x = padding + (index / (data.length - 1)) * chartWidth;
+                    const y = height - padding - (value / maxValue) * chartHeight;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+            
+            // Labels
+            ctx.fillStyle = 'white';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            weatherData.forEach((item, index) => {
+                if(index % 3 === 0) {
+                    const x = padding + (index / (data.length - 1)) * chartWidth;
+                    ctx.fillText(item.date, x, height - 10);
+                }
+            });
+            
+            ctx.textAlign = 'right';
+            for(let i = 0; i <= 5; i++) {
+                const value = Math.round((maxValue / 5) * (5 - i));
+                const y = padding + (chartHeight / 5) * i + 4;
+                ctx.fillText(value.toString(), padding - 10, y);
+            }
+        }
+
+        function setActiveTab(tab) {
+            activeTab = tab;
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tabEl => {
+                tabEl.classList.remove('active');
+                tabEl.classList.add('inactive');
+            });
+            event.target.classList.add('active');
+            event.target.classList.remove('inactive');
+            drawChart();
+        }
+
+        // Regen-Animation erstellen
+        function createRain() {
+            const weatherAnim = document.querySelector('.weather-animation');
+            for(let i = 0; i < 40; i++) {
+                const rain = document.createElement('div');
+                rain.className = 'rain';
+                rain.style.left = Math.random() * 100 + '%';
+                rain.style.animationDuration = (Math.random() * 0.5 + 0.5) + 's';
+                rain.style.animationDelay = Math.random() * 2 + 's';
+                weatherAnim.appendChild(rain);
+            }
+        }
+
+        window.addEventListener('load', function() {
+            drawChart();
+            createRain();
+        });
+        
+        window.addEventListener('resize', function() {
+            setTimeout(drawChart, 100);
+        });
+    </script>
 </body>
 </html>
