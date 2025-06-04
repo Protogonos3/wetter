@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wetter für die beste Mama der Welt</title>
+    <title>Live-Wetter für die beste Mama der Welt</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -105,6 +105,25 @@
         }
         .rain-time .desc {
             font-size: 0.8rem; color: rgba(255,255,255,0.9);
+        }
+
+        /* Live Update Status */
+        .update-status {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4caf50;
+            border-radius: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: white;
+        }
+        .update-status.loading {
+            background: rgba(255, 193, 7, 0.2);
+            border-color: #ffc107;
+        }
+        .update-status.error {
+            background: rgba(244, 67, 54, 0.2);
+            border-color: #f44336;
         }
 
         .current-header h2 {
@@ -276,90 +295,79 @@
     <div class="container">
         <div class="header">
             <h1>💖 Für die beste Mama der Welt 💖</h1>
-            <p>Dein Wetter in Rumeln-Kaldenhausen</p>
-            <p>14-Tage Prognose ab 4. Juni 2025</p>
+            <p>Live-Wetter in Rumeln-Kaldenhausen</p>
+            <p id="current-date">Wird geladen...</p>
+        </div>
+
+        <div class="update-status" id="updateStatus">
+            🔄 Lade aktuelle Wetterdaten...
         </div>
 
         <div class="love-message">
-            👩‍👦‍👦 Liebe Mama, hier ist dein aktuelles Wetter! Du bist die Beste! 🌈💕
+            👩‍👦‍👦 Liebe Mama, hier ist dein Live-Wetter! Immer aktuell für dich! 🌈💕
         </div>
 
         <!-- Regenwarnung -->
-        <div class="rain-alert">
+        <div class="rain-alert" id="rainAlert" style="display: none;">
             <h3>⚠️ Regenwarnung für Mama ☔</h3>
-            <div class="rain-times">
-                <div class="rain-time">
-                    <div class="time">Heute Nachmittag</div>
-                    <div class="desc">Gewitter ab 15:00 Uhr</div>
-                </div>
-                <div class="rain-time">
-                    <div class="time">Morgen Vormittag</div>
-                    <div class="desc">Schauer ab 09:00 Uhr</div>
-                </div>
-                <div class="rain-time">
-                    <div class="time">Freitag</div>
-                    <div class="desc">Leichter Regen ganztägig</div>
-                </div>
-                <div class="rain-time">
-                    <div class="time">Samstag Abend</div>
-                    <div class="desc">Starker Regen ab 18:00</div>
-                </div>
+            <div class="rain-times" id="rainTimes">
+                <!-- Wird dynamisch gefüllt -->
             </div>
         </div>
 
         <div class="current-weather">
             <div class="current-header">
                 <h2>Aktuelles Wetter</h2>
-                <div class="current-time">
-                    <p>Mittwoch, 4. Juni 2025 - Rumeln-Kaldenhausen</p>
+                <div class="current-time" id="currentTime">
+                    Wird geladen...
                 </div>
             </div>
             
             <div class="current-main">
-                <div class="current-icon">⛈️</div>
-                <div class="current-temp">21°C</div>
-                <div class="feels-like">Gefühlt: 21°C</div>
-                <div class="condition">Gewitter am Nachmittag</div>
+                <div class="current-icon" id="currentIcon">🌤️</div>
+                <div class="current-temp" id="currentTemp">--°C</div>
+                <div class="feels-like" id="feelsLike">Gefühlt: --°C</div>
+                <div class="condition" id="currentCondition">Lädt...</div>
                 <div class="rain-chance">
                     <span style="margin-right: 0.5rem;">☂️</span>
-                    <span>85% Regen</span>
+                    <span id="rainChance">--%</span>
                 </div>
             </div>
 
             <div class="today-range">
                 <div class="label">Heute</div>
-                <div class="temps">21° / 14°</div>
+                <div class="temps" id="todayRange">--° / --°</div>
             </div>
 
             <div class="details-grid">
                 <div class="detail-card">
                     <div class="icon">💨</div>
-                    <div class="value">18 km/h</div>
+                    <div class="value" id="windSpeed">-- km/h</div>
                     <div class="label">Wind</div>
                 </div>
                 <div class="detail-card">
                     <div class="icon">💧</div>
-                    <div class="value">72%</div>
+                    <div class="value" id="humidity">--%</div>
                     <div class="label">Luftfeuchtigkeit</div>
                 </div>
                 <div class="detail-card">
                     <div class="icon">🌧️</div>
-                    <div class="value">12 mm</div>
+                    <div class="value" id="precipitation">-- mm</div>
                     <div class="label">Niederschlag</div>
                 </div>
                 <div class="detail-card">
                     <div class="icon">☀️</div>
-                    <div class="value">UV-Index 3</div>
-                    <div class="label">Mäßig</div>
+                    <div class="value" id="uvIndex">UV --</div>
+                    <div class="label">UV-Index</div>
                 </div>
                 <div class="detail-card">
                     <div class="icon">🌅</div>
-                    <div class="value">05:17</div>
+                    <div class="value" id="sunrise">--:--</div>
                     <div class="label">Sonnenaufgang</div>
                 </div>
                 <div class="detail-card">
                     <div class="icon">🌇</div>
-                    <div class="value">21:44</div>
+                    <div class="value" id="sunset">--:--</div>
                     <div class="label">Sonnenuntergang</div>
                 </div>
             </div>
@@ -385,285 +393,169 @@
         </div>
 
         <div class="forecast-container">
-            <h3 class="forecast-title">14-Tage Wettervorhersage für meine liebe Mama</h3>
+            <h3 class="forecast-title">7-Tage Live-Vorhersage für meine liebe Mama</h3>
             
             <div class="forecast-scroll">
-                <div class="forecast-grid">
-                    <div class="forecast-card today">
-                        <div class="forecast-day">Heute</div>
-                        <div class="forecast-date">04.06</div>
-                        <div class="forecast-icon">⛈️</div>
-                        <div class="forecast-condition">Gewitter nachmittags</div>
-                        <div class="forecast-temp"><span class="high">21°</span><span class="low">/14°</span></div>
-                        <div class="forecast-rain"><span class="icon">☂️</span>85%</div>
-                    </div>
-                    <div class="forecast-card">
-                        <div class="forecast-day">Morgen</div>
-                        <div class="forecast-date">05.06</div>
-                        <div class="forecast-icon">🌦️</div>
-                        <div class="forecast-condition">Morgenschauer</div>
-                        <div class="forecast-temp"><span class="high">18°</span><span class="low">/11°</span></div>
-                        <div class="forecast-rain"><span class="icon">☂️</span>65%</div>
-                    </div>
-                    <div class="forecast-card">
-                        <div class="forecast-day">Freitag</div>
-                        <div class="forecast-date">06.06</div>
-                        <div class="forecast-icon">🌧️</div>
-                        <div class="forecast-condition">Leichter Regen</div>
-                        <div class="forecast-temp"><span class="high">19°</span><span class="low">/12°</span></div>
-                        <div class="forecast-rain"><span class="icon">☂️</span>70%</div>
-                    </div>
-                    <div class="forecast-card">
-                        <div class="forecast-day">Samstag</div>
-                        <div class="forecast-date">07.06</div>
-                        <div class="forecast-icon">⛈️</div>
-                        <div class="forecast-condition">Starker Regen</div>
-                        <div class="forecast-temp"><span class="high">17°</span><span class="low">/10°</span></div>
-                        <div class="forecast-rain"><span class="icon">☂️</span>90%</div>
-                    </div>
-                    <div class="forecast-card">
-                        <div class="forecast-day">Sonntag</div>
-                        <div class="forecast-date">08.06</div>
-                        <div class="forecast-icon">🌤️</div>
-                        <div class="forecast-condition">Aufklarend</div>
-                        <div class="forecast-temp"><span class="high">20°</span><span class="low">/12°</span></div>
-                        <div class="forecast-rain"><span class="icon">☂️</span>30%</div>
-                    </div>
-                    <div class="forecast-card">
-                        <div class="forecast-day">Montag</div>
-                        <div class="forecast-date">09.06</div>
-                        <div class="forecast-icon">☀️</div>
-                        <div class="forecast-condition">Sonnig</div>
-                        <div class="forecast-temp"><span class="high">23°</span><span class="low">/13°</span></div>
-                        <div class="forecast-rain"><span class="icon">☂️</span>10%</div>
-                    </div>
-                    <div class="forecast-card">
-                        <div class="forecast-day">Dienstag</div>
-                        <div class="forecast-date">10.06</div>
-                        <div class="forecast-icon">☀️</div>
-                        <div class="forecast-condition">Sonnig</div>
-                        <div class="forecast-temp"><span class="high">25°</span><span class="low">/15°</span></div>
-                        <div class="forecast-rain"><span class="icon">☂️</span>5%</div>
-                    </div>
-                    <div class="forecast-card">
-                        <div class="forecast-day">Mittwoch</div>
-                        <div class="forecast-date">11.06</div>
-                        <div class="forecast-icon">🌤️</div>
-                        <div class="forecast-condition">Teilweise bewölkt</div>
-                        <div class="forecast-temp"><span class="high">24°</span><span class="low">/16°</span></div>
-                        <div class="forecast-rain"><span class="icon">☂️</span>20%</div>
-                    </div>
-                    <div class="forecast-card">
-                        <div class="forecast-day">Donnerstag</div>
-                        <div class="forecast-date">12.06</div>
-                        <div class="forecast-icon">🌦️</div>
-                        <div class="forecast-condition">Vereinzelte Schauer</div>
-                        <div class="forecast-temp"><span class="high">22°</span><span class="low">/14°</span></div>
-                        <div class="forecast-rain"><span class="icon">☂️</span>40%</div>
-                    </div>
-                    <div class="forecast-card">
-                        <div class="forecast-day">Freitag</div>
-                        <div class="forecast-date">13.06</div>
-                        <div class="forecast-icon">☀️</div>
-                        <div class="forecast-condition">Sonnig</div>
-                        <div class="forecast-temp"><span class="high">26°</span><span class="low">/16°</span></div>
-                        <div class="forecast-rain"><span class="icon">☂️</span>5%</div>
-                    </div>
-                    <div class="forecast-card">
-                        <div class="forecast-day">Samstag</div>
-                        <div class="forecast-date">14.06</div>
-                        <div class="forecast-icon">☀️</div>
-                        <div class="forecast-condition">Sonnig</div>
-                        <div class="forecast-temp"><span class="high">28°</span><span class="low">/17°</span></div>
-                        <div class="forecast-rain"><span class="icon">☂️</span>5%</div>
-                    </div>
-                    <div class="forecast-card">
-                        <div class="forecast-day">Sonntag</div>
-                        <div class="forecast-date">15.06</div>
-                        <div class="forecast-icon">🌤️</div>
-                        <div class="forecast-condition">Teilweise bewölkt</div>
-                        <div class="forecast-temp"><span class="high">27°</span><span class="low">/18°</span></div>
-                        <div class="forecast-rain"><span class="icon">☂️</span>15%</div>
-                    </div>
-                    <div class="forecast-card">
-                        <div class="forecast-day">Montag</div>
-                        <div class="forecast-date">16.06</div>
-                        <div class="forecast-icon">🌦️</div>
-                        <div class="forecast-condition">Vereinzelte Schauer</div>
-                        <div class="forecast-temp"><span class="high">25°</span><span class="low">/17°</span></div>
-                        <div class="forecast-rain"><span class="icon">☂️</span>35%</div>
-                    </div>
-                    <div class="forecast-card">
-                        <div class="forecast-day">Dienstag</div>
-                        <div class="forecast-date">17.06</div>
-                        <div class="forecast-icon">☀️</div>
-                        <div class="forecast-condition">Sonnig</div>
-                        <div class="forecast-temp"><span class="high">26°</span><span class="low">/17°</span></div>
-                        <div class="forecast-rain"><span class="icon">☂️</span>10%</div>
-                    </div>
+                <div class="forecast-grid" id="forecastGrid">
+                    <!-- Wird dynamisch gefüllt -->
                 </div>
             </div>
 
             <div class="love-message">
-                👩💕 Liebe Mama, pass bei dem Regenwetter gut auf dich auf! Du bist die wunderbarste Mama der Welt! 🌺💖
+                👩💕 Liebe Mama, das Wetter aktualisiert sich automatisch alle 3 Stunden! Du bist die wunderbarste Mama der Welt! 🌺💖
             </div>
         </div>
     </div>
 
     <script>
         let activeTab = 'temperature';
-        const weatherData = [
-            { date: '04.06', high: 21, low: 14, precipitation: 85, humidity: 72, wind: 18 },
-            { date: '05.06', high: 18, low: 11, precipitation: 65, humidity: 68, wind: 15 },
-            { date: '06.06', high: 19, low: 12, precipitation: 70, humidity: 70, wind: 12 },
-            { date: '07.06', high: 17, low: 10, precipitation: 90, humidity: 75, wind: 20 },
-            { date: '08.06', high: 20, low: 12, precipitation: 30, humidity: 60, wind: 14 },
-            { date: '09.06', high: 23, low: 13, precipitation: 10, humidity: 50, wind: 10 },
-            { date: '10.06', high: 25, low: 15, precipitation: 5, humidity: 45, wind: 8 },
-            { date: '11.06', high: 24, low: 16, precipitation: 20, humidity: 52, wind: 11 },
-            { date: '12.06', high: 22, low: 14, precipitation: 40, humidity: 58, wind: 13 },
-            { date: '13.06', high: 26, low: 16, precipitation: 5, humidity: 45, wind: 9 },
-            { date: '14.06', high: 28, low: 17, precipitation: 5, humidity: 42, wind: 8 },
-            { date: '15.06', high: 27, low: 18, precipitation: 15, humidity: 48, wind: 10 },
-            { date: '16.06', high: 25, low: 17, precipitation: 35, humidity: 55, wind: 12 },
-            { date: '17.06', high: 26, low: 17, precipitation: 10, humidity: 47, wind: 9 }
-        ];
+        let weatherData = [];
+        let currentWeatherData = null;
 
-        function drawChart() {
-            const canvas = document.getElementById('weatherChart');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const width = canvas.width;
-            const height = canvas.height;
-            ctx.clearRect(0, 0, width, height);
-            
-            const padding = 40;
-            const chartWidth = width - 2 * padding;
-            const chartHeight = height - 2 * padding;
-            
-            let data, color, maxValue;
-            switch(activeTab) {
-                case 'temperature':
-                    data = weatherData.map(d => d.high);
-                    color = '#c2185b';
-                    maxValue = Math.max(...data) + 2;
-                    break;
-                case 'precipitation':
-                    data = weatherData.map(d => d.precipitation);
-                    color = '#2196f3';
-                    maxValue = 100;
-                    break;
-                case 'humidity':
-                    data = weatherData.map(d => d.humidity);
-                    color = '#9c27b0';
-                    maxValue = 100;
-                    break;
-                case 'wind':
-                    data = weatherData.map(d => d.wind);
-                    color = '#4caf50';
-                    maxValue = Math.max(...data) + 5;
-                    break;
-            }
-            
-            // Grid
-            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-            ctx.lineWidth = 1;
-            for(let i = 0; i <= 5; i++) {
-                const y = padding + (chartHeight / 5) * i;
-                ctx.beginPath();
-                ctx.moveTo(padding, y);
-                ctx.lineTo(width - padding, y);
-                ctx.stroke();
-            }
-            
-            // Chart
-            if(activeTab === 'precipitation' || activeTab === 'wind') {
-                const barWidth = chartWidth / data.length * 0.6;
-                const barSpacing = chartWidth / data.length;
-                ctx.fillStyle = color;
-                data.forEach((value, index) => {
-                    const barHeight = (value / maxValue) * chartHeight;
-                    const x = padding + index * barSpacing + (barSpacing - barWidth) / 2;
-                    const y = height - padding - barHeight;
-                    ctx.fillRect(x, y, barWidth, barHeight);
-                });
-            } else {
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                data.forEach((value, index) => {
-                    const x = padding + (index / (data.length - 1)) * chartWidth;
-                    const y = height - padding - (value / maxValue) * chartHeight;
-                    if(index === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
-                });
-                ctx.stroke();
-                
-                ctx.fillStyle = color;
-                data.forEach((value, index) => {
-                    const x = padding + (index / (data.length - 1)) * chartWidth;
-                    const y = height - padding - (value / maxValue) * chartHeight;
-                    ctx.beginPath();
-                    ctx.arc(x, y, 4, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-            }
-            
-            // Labels
-            ctx.fillStyle = 'white';
-            ctx.font = '12px sans-serif';
-            ctx.textAlign = 'center';
-            weatherData.forEach((item, index) => {
-                if(index % 3 === 0) {
-                    const x = padding + (index / (data.length - 1)) * chartWidth;
-                    ctx.fillText(item.date, x, height - 10);
-                }
-            });
-            
-            ctx.textAlign = 'right';
-            for(let i = 0; i <= 5; i++) {
-                const value = Math.round((maxValue / 5) * (5 - i));
-                const y = padding + (chartHeight / 5) * i + 4;
-                ctx.fillText(value.toString(), padding - 10, y);
-            }
-        }
-
-        function setActiveTab(tab) {
-            activeTab = tab;
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tabEl => {
-                tabEl.classList.remove('active');
-                tabEl.classList.add('inactive');
-            });
-            event.target.classList.add('active');
-            event.target.classList.remove('inactive');
-            drawChart();
-        }
-
-        // Regen-Animation erstellen
-        function createRain() {
-            const weatherAnim = document.querySelector('.weather-animation');
-            for(let i = 0; i < 40; i++) {
-                const rain = document.createElement('div');
-                rain.className = 'rain';
-                rain.style.left = Math.random() * 100 + '%';
-                rain.style.animationDuration = (Math.random() * 0.5 + 0.5) + 's';
-                rain.style.animationDelay = Math.random() * 2 + 's';
-                weatherAnim.appendChild(rain);
-            }
-        }
-
-        window.addEventListener('load', function() {
-            drawChart();
-            createRain();
-        });
+        // Meteoblue API-Konfiguration
+        const API_KEY = 'zDBo0perYENW4dls';
+        const METEOBLUE_URL = 'https://my.meteoblue.com/packages/basic-1h_basic-day';
         
-        window.addEventListener('resize', function() {
-            setTimeout(drawChart, 100);
-        });
-    </script>
-</body>
-</html>
+        // Rumeln-Kaldenhausen Koordinaten
+        const LAT = 51.405;
+        const LON = 6.654;
+        const ASL = 33; // Höhe über Meeresspiegel
+
+        // Fallback-Daten falls Meteoblue API nicht verfügbar
+        const fallbackData = {
+            current: {
+                temp: 21,
+                feels_like: 21,
+                humidity: 72,
+                wind_speed: 5,
+                weather: [{main: 'Clouds', description: 'bewölkt', icon: '04d'}],
+                uvi: 3
+            },
+            daily: [
+                {dt: Date.now()/1000, temp: {min: 14, max: 21}, weather: [{main: 'Thunderstorm', description: 'Gewitter', icon: '11d'}], pop: 0.85, humidity: 72},
+                {dt: Date.now()/1000 + 86400, temp: {min: 11, max: 18}, weather: [{main: 'Rain', description: 'Regen', icon: '10d'}], pop: 0.65, humidity: 68},
+                {dt: Date.now()/1000 + 172800, temp: {min: 12, max: 19}, weather: [{main: 'Rain', description: 'Leichter Regen', icon: '09d'}], pop: 0.70, humidity: 70},
+                {dt: Date.now()/1000 + 259200, temp: {min: 10, max: 17}, weather: [{main: 'Rain', description: 'Starker Regen', icon: '10d'}], pop: 0.90, humidity: 75},
+                {dt: Date.now()/1000 + 345600, temp: {min: 12, max: 20}, weather: [{main: 'Clouds', description: 'Aufklarend', icon: '03d'}], pop: 0.30, humidity: 60},
+                {dt: Date.now()/1000 + 432000, temp: {min: 13, max: 23}, weather: [{main: 'Clear', description: 'Sonnig', icon: '01d'}], pop: 0.10, humidity: 50},
+                {dt: Date.now()/1000 + 518400, temp: {min: 15, max: 25}, weather: [{main: 'Clear', description: 'Sonnig', icon: '01d'}], pop: 0.05, humidity: 45}
+            ]
+        };
+
+        // Datum und Zeit Funktionen
+        function getCurrentDate() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            return now.toLocaleDateString('de-DE', options);
+        }
+
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function formatDate(timestamp) {
+            const date = new Date(timestamp * 1000);
+            return date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+        }
+
+        function getDayName(timestamp) {
+            const date = new Date(timestamp * 1000);
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            
+            if (date.toDateString() === today.toDateString()) return 'Heute';
+            if (date.toDateString() === tomorrow.toDateString()) return 'Morgen';
+            
+            return date.toLocaleDateString('de-DE', { weekday: 'long' });
+        }
+
+        // Wetter Icons zuordnen
+        function getWeatherIcon(iconCode, main) {
+            const iconMap = {
+                '01d': '☀️', '01n': '🌙',
+                '02d': '🌤️', '02n': '☁️',
+                '03d': '☁️', '03n': '☁️',
+                '04d': '☁️', '04n': '☁️',
+                '09d': '🌧️', '09n': '🌧️',
+                '10d': '🌦️', '10n': '🌧️',
+                '11d': '⛈️', '11n': '⛈️',
+                '13d': '🌨️', '13n': '🌨️',
+                '50d': '🌫️', '50n': '🌫️'
+            };
+            return iconMap[iconCode] || '🌤️';
+        }
+
+        // API-Aufruf mit Meteoblue
+        async function fetchWeatherData() {
+            updateStatus('🔄 Lade aktuelle Wetterdaten von Meteoblue...', 'loading');
+            
+            try {
+                const url = `${METEOBLUE_URL}?apikey=${API_KEY}&lat=${LAT}&lon=${LON}&asl=${ASL}&format=json`;
+                console.log('Meteoblue API URL:', url);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Meteoblue Daten:', data);
+                
+                // Meteoblue Daten in unser Format konvertieren
+                const convertedData = convertMeteoblueData(data);
+                updateWeatherDisplay(convertedData);
+                updateStatus('✅ Live-Daten von Meteoblue um ' + getCurrentTime(), 'success');
+                
+            } catch (error) {
+                console.error('Fehler beim Laden der Meteoblue-Daten:', error);
+                updateWeatherDisplay(fallbackData);
+                updateStatus('⚠️ Offline-Daten angezeigt (Meteoblue nicht erreichbar)', 'error');
+            }
+        }
+
+        // Meteoblue Daten konvertieren
+        function convertMeteoblueData(meteoblueData) {
+            try {
+                const data_1h = meteoblueData.data_1h;
+                const data_day = meteoblueData.data_day;
+                
+                if (!data_1h || !data_day) {
+                    throw new Error('Unvollständige Meteoblue-Daten');
+                }
+                
+                // Aktuelles Wetter (letzte Stunde)
+                const currentHour = data_1h.time.length - 1;
+                const current = {
+                    temp: data_1h.temperature[currentHour] || 20,
+                    feels_like: data_1h.felttemperature[currentHour] || data_1h.temperature[currentHour] || 20,
+                    humidity: data_1h.relativehumidity[currentHour] || 60,
+                    wind_speed: (data_1h.windspeed[currentHour] || 10) / 3.6, // km/h zu m/s
+                    weather: [{
+                        main: getWeatherMain(data_1h.pictocode[currentHour]),
+                        description: getWeatherDescription(data_1h.pictocode[currentHour]),
+                        icon: getMeteoblueIcon(data_1h.pictocode[currentHour])
+                    }],
+                    uvi: data_1h.uvindex ? data_1h.uvindex[currentHour] : 3
+                };
+                
+                // 7-Tage Vorhersage
+                const daily = [];
+                for (let i = 0; i < Math.min(7, data_day.time.length); i++) {
+                    daily.push({
+                        dt: new Date(data_day.time[i]).getTime() / 1000,
+                        temp: {
+                            min: data_day.temperature_min[i] || 15,
+                            max: data_day.temperature_max[i] || 25
+                        },
+                        weather: [{
+                            main: getWeatherMain(data_day.pictocode[i]),
+                            description: getWeatherDescription(data_day.pictocode[i]),
+                            icon: getMeteoblueIcon(data_day.pictocode[i])
